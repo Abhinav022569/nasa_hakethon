@@ -1,5 +1,5 @@
 <?php
-// --- BACKEND API ENDPOINT (api.php) - Final Perfected Version ---
+// --- BACKEND API ENDPOINT (api.php) - Corrected Version ---
 
 header('Content-Type: application/json');
 
@@ -48,7 +48,8 @@ $ground_o3 = $airData['list'][0]['components']['o3'];
 $ground_no2 = $airData['list'][0]['components']['no2'];
 
 function simulate_satellite_reading($ground_value) {
-    return $ground_value * (1 + (rand(-15, 15) / 100));
+    // A more stable simulation
+    return $ground_value * (1 + (rand(-5, 5) / 100));
 }
 $fused_pm25 = ($ground_pm25 * 0.7) + (simulate_satellite_reading($ground_pm25) * 0.3);
 $fused_o3 = ($ground_o3 * 0.7) + (simulate_satellite_reading($ground_o3) * 0.3);
@@ -66,7 +67,7 @@ function calculateAqi($concentration, $pollutant) {
             return round((($bp[3] - $bp[2]) / ($bp[1] - $bp[0])) * ($concentration - $bp[0]) + $bp[2]);
         }
     }
-    return 0;
+    return 500; // Return max value if it exceeds breakpoints
 }
 
 $pm25_aqi = calculateAqi($fused_pm25, 'pm25');
@@ -80,22 +81,36 @@ function getWeatherIcon($iconCode) {
     return $iconMap[$iconCode] ?? "❓";
 }
 
-// Generate 7-day forecast
+// --- REVISED FORECAST LOGIC ---
+
+// Generate 7-day forecast with a smoother, more realistic trend
 $dailyForecast = [];
 for ($i = 0; $i < 7; $i++) {
+    // Use a sine wave for gentle, predictable daily fluctuation
+    $fluctuation = round(10 * sin($i * 0.9));
     $dailyForecast[] = [
         "day" => date("l", strtotime("+$i day")),
-        "aqi" => max(0, $overallAqi + rand(-15, 20 * ($i + 1)))
+        "aqi" => max(0, $overallAqi + $fluctuation)
     ];
 }
 
-// Generate 48-hour forecast
+// Generate 48-hour forecast simulating a diurnal (daily) pattern
 $hourlyForecast = [];
 $currentHour = (int)date('G');
 for ($i = 0; $i < 48; $i++) {
+    $hourOfDay = ($currentHour + $i) % 24;
+    $fluctuation = 0;
+    // Simulate higher AQI during morning (6-9) and evening (17-20) rush hours
+    if ($hourOfDay >= 6 && $hourOfDay <= 9) {
+        $fluctuation = rand(5, 12);
+    } elseif ($hourOfDay >= 17 && $hourOfDay <= 20) {
+        $fluctuation = rand(3, 10);
+    } else { // Lower AQI overnight and mid-day
+        $fluctuation = rand(-8, 2);
+    }
     $hourlyForecast[] = [
-        "hour" => ($currentHour + $i) % 24,
-        "aqi" => max(0, $overallAqi + rand(-10, 10))
+        "hour" => $hourOfDay,
+        "aqi" => max(0, $overallAqi + $fluctuation)
     ];
 }
 
@@ -106,7 +121,7 @@ $response = [
     "pollutants" => [ "o3" => $fused_o3, "no2" => $fused_no2, "so2" => $airData['list'][0]['components']['so2'], "pm25" => $fused_pm25 ],
     "weather" => [ "temp" => $weatherData['main']['temp'], "humidity" => $weatherData['main']['humidity'], "wind" => $weatherData['wind']['speed'] . " mph", "icon" => getWeatherIcon($weatherData['weather'][0]['icon']) ],
     "forecast" => $dailyForecast,
-    "hourly_forecast" => $hourlyForecast // <-- ADDED HOURLY DATA
+    "hourly_forecast" => $hourlyForecast
 ];
 
 echo json_encode($response);
