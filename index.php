@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="style.css" rel="stylesheet">
 </head>
@@ -26,10 +29,6 @@
             <a href="#" class="sidebar-link active">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
                 <span>Home</span>
-            </a>
-             <a href="#" class="sidebar-link">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                <span>Map</span>
             </a>
              <a href="#" class="sidebar-link">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
@@ -54,9 +53,6 @@
                 <a href="#" class="nav-tab active">Map</a>
                 <a href="#" class="nav-tab">Forecast</a>
                 <a href="#" class="nav-tab">Alerts</a>
-                <a href="#" class="nav-tab">TEMPO</a>
-                <a href="#" class="nav-tab">Ground</a>
-                <a href="#" class="nav-tab">Weather</a>
              </div>
              <div class="flex items-center gap-4">
                 <div class="search-container">
@@ -96,10 +92,9 @@
                     <!-- Current Conditions -->
                     <div class="card p-4">
                         <div class="flex justify-between items-center mb-3">
-                             <h3 class="font-semibold text-gray-700">Current Conditions</h3>
+                             <h3 class="font-semibold text-gray-700">Current AIR Conditions</h3>
                              <span id="current-aqi-badge" class="aqi-badge"></span>
                         </div>
-                        <p class="text-xs text-gray-400 mb-2">Based on TEMPO + Ground + Weather</p>
                         <div id="current-pollutants" class="grid grid-cols-3 gap-3">
                             <!-- Current pollutants injected here -->
                         </div>
@@ -117,21 +112,6 @@
                         <ul id="forecast-list" class="space-y-3">
                            <!-- Forecast items injected here -->
                         </ul>
-                    </div>
-
-                    <!-- Notification Settings -->
-                    <div class="card p-4">
-                        <h3 class="font-semibold text-gray-700 mb-4">Notification Settings</h3>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center">
-                                <label for="aqi-toggle" class="text-sm text-gray-600">AQI above 100</label>
-                                <div class="switch-container"><input type="checkbox" id="aqi-toggle" class="switch"><label for="aqi-toggle"></label></div>
-                            </div>
-                             <div class="flex justify-between items-center">
-                                <label for="pm25-toggle" class="text-sm text-gray-600">PM2.5 above 35 µg/m³</label>
-                                <div class="switch-container"><input type="checkbox" id="pm25-toggle" class="switch"><label for="pm25-toggle"></label></div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- AQI Guidance -->
