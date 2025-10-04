@@ -1,301 +1,105 @@
-<?php
-require 'data.php';
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AeroGuard - Futuristic Air Quality Monitor</title>
+    <title>AeroForecast - Real-time Air Quality</title>
+    <!-- Tailwind CSS for utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <!-- Link to the external stylesheet -->
+    <link href="style.css" rel="stylesheet">
 </head>
-<body class="p-4 lg:p-8">
+<body>
+    <div id="app" class="min-h-screen flex flex-col">
 
-    <div class="max-w-screen-2xl mx-auto">
         <!-- Header -->
-        <header class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-bold tracking-wider text-white">
-                <i class="fas fa-wind mr-2 text-blue-400"></i>AeroGuard
-            </h1>
-            <div class="flex items-center space-x-3">
-                <div class="w-3 h-3 bg-green-400 rounded-full status-dot"></div>
-                <span class="text-sm text-green-400 font-medium">Real-time data</span>
+        <header class="header fixed top-0 left-0 right-0 z-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+                <h1 class="text-2xl md:text-3xl font-bold tracking-wider font-display text-shadow">
+                    AeroForecast
+                </h1>
+                <span class="text-sm hidden sm:block text-gray-400">Real-time Atmospheric Analysis</span>
             </div>
         </header>
-
-        <!-- Main Grid -->
-        <main class="grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-            
-            <!-- Left Column -->
-            <div class="lg:col-span-1 xl:col-span-1 space-y-8">
-                <!-- Search Location -->
-                <div class="glass-card p-6">
-                    <h2 class="text-xl font-semibold mb-4 text-white">Search Location</h2>
-                    <div class="relative">
-                        <input id="location-input" type="text" placeholder="Enter City or ZIP code" class="w-full bg-transparent border-2 border-gray-600 rounded-lg py-3 px-4 focus:outline-none focus:border-blue-400 transition duration-300">
-                        <button class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                    <button class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg mt-4">Search</button>
-                </div>
-
-                <!-- Recent Searches -->
-                <div class="glass-card p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold text-white">Recent Searches</h2>
-                        <button class="text-sm text-gray-400 hover:text-white transition">Clear</button>
-                    </div>
-                    <ul id="recent-searches" class="space-y-4">
-                        <!-- JS will populate this -->
-                    </ul>
-                </div>
-
-                <!-- Futuristic Tips -->
-                <div class="glass-card p-6">
-                    <h2 class="text-xl font-semibold mb-4 text-white"><i class="fas fa-lightbulb mr-2 text-yellow-300"></i>Futuristic Tips</h2>
-                    <div id="tip-container" class="text-gray-300 space-y-3">
-                       <!-- JS will populate this -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Center Column -->
-            <div class="lg:col-span-3 xl:col-span-2 space-y-8">
-                <!-- Main AQI Display -->
-                <div class="glass-card p-8">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="text-2xl font-bold text-white" id="current-city">San Francisco, CA</h3>
-                            <p class="text-gray-400" id="update-time">Updated just now</p>
-                        </div>
-                        <div id="aqi-status-badge" class="px-4 py-1 rounded-full text-sm font-bold">Good</div>
-                    </div>
-
-                    <div class="flex flex-col md:flex-row items-center justify-around gap-8 mt-8">
-                        <!-- AQI Gauge -->
-                        <div class="relative">
-                           <svg class="w-48 h-48 transform -rotate-90" viewBox="0 0 120 120">
-                                <circle class="aqi-gauge-bg" cx="60" cy="60" r="54" fill="none" stroke-width="12"></circle>
-                                <circle id="aqi-gauge-fg" class="aqi-gauge-fg" cx="60" cy="60" r="54" fill="none" stroke-width="12" pathLength="100"></circle>
-                           </svg>
-                           <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                <span id="aqi-value" class="text-5xl font-bold">42</span>
-                                <span class="text-lg text-gray-400">AQI</span>
-                           </div>
-                        </div>
-
-                        <!-- Pollutant Details -->
-                        <div class="grid grid-cols-3 gap-x-6 gap-y-6 w-full md:w-auto">
-                            <!-- JS will populate this -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Live Map -->
-                 <div class="glass-card p-6 h-96 lg:h-auto flex-grow">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold text-white">Live Map — United States</h2>
-                        <div class="flex items-center space-x-2 text-sm text-blue-400">
-                             <div class="w-2 h-2 bg-blue-400 rounded-full status-dot"></div>
-                             <span>Streaming</span>
-                        </div>
-                    </div>
-                    <div class="relative w-full h-full min-h-[300px] lg:min-h-0 rounded-lg overflow-hidden">
-                        <img src="https://placehold.co/800x600/0a0a1a/e0e0e0?text=Live+Map" class="w-full h-full object-cover opacity-20" alt="Map of United States">
-                        <div class="map-overlay"></div>
-                        <div id="map-points-container">
-                            <!-- JS will generate map points -->
-                        </div>
-                    </div>
-                 </div>
-            </div>
-            
-            <!-- Right Column -->
-            <div class="lg:col-span-4 xl:col-span-2">
-                 <div class="glass-card p-6 h-full">
-                    <h2 class="text-xl font-semibold mb-4 text-white"><i class="fas fa-notes-medical mr-2 text-cyan-300"></i>Health Recommendation</h2>
-                    <div id="health-recommendation" class="text-gray-300 leading-relaxed">
-                        <!-- JS will populate this -->
-                    </div>
-                </div>
-            </div>
-
-        </main>
         
+        <div class="pt-20"> <!-- Padding to offset for fixed header -->
+            <!-- Notification Banner -->
+            <div id="notification-banner" class="notification-banner text-center p-3 font-semibold shadow-lg">
+                <span id="notification-text"></span>
+                <button onclick="AeroForecastApp.closeNotification()" class="ml-4 font-bold text-xl">&times;</button>
+            </div>
+
+            <!-- Main Content -->
+            <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+
+                    <!-- Left Panel: Controls and Data Display -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <!-- Search Card -->
+                        <div class="card p-5">
+                            <h2 class="text-xl font-semibold mb-3 font-display">Atmospheric Scan</h2>
+                            <div class="flex items-center space-x-2">
+                                <input type="text" id="search-input" placeholder="Enter City, State, or Zip..." class="search-input w-full">
+                                <button id="search-button" class="search-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Results Display Card -->
+                        <div id="results-card" class="card p-5 hidden">
+                            <div id="loader" class="loader hidden"></div>
+                            <div id="results-content" class="hidden">
+                                <div class="text-center mb-4">
+                                    <h3 id="location-name" class="text-3xl font-bold font-display"></h3>
+                                    <p class="text-gray-400 text-sm mt-1">Air Quality Index (AQI)</p>
+                                    <div id="aqi-pill-container" class="mt-3"></div>
+                                    <p id="aqi-category" class="font-semibold mt-2 text-lg"></p>
+                                </div>
+
+                                <div class="border-b border-gray-700">
+                                    <nav class="-mb-px flex space-x-4" aria-label="Tabs">
+                                        <button onclick="AeroForecastApp.showTab('health')" id="tab-health" class="tab-button active">Health Intel</button>
+                                        <button onclick="AeroForecastApp.showTab('pollutants')" id="tab-pollutants" class="tab-button">Pollutants</button>
+                                        <button onclick="AeroForecastApp.showTab('weather')" id="tab-weather" class="tab-button">Atmos Data</button>
+                                    </nav>
+                                </div>
+
+                                <div id="tab-content-health" class="tab-content mt-4 text-sm text-gray-300"></div>
+                                <div id="tab-content-pollutants" class="tab-content hidden mt-4 space-y-3"></div>
+                                <div id="tab-content-weather" class="tab-content hidden mt-4 space-y-3"></div>
+
+                                <div class="mt-6">
+                                     <h4 class="text-lg font-semibold text-gray-300 mb-2 font-display">Forecast</h4>
+                                     <div id="forecast-container" class="grid grid-cols-3 gap-2 text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Map -->
+                    <div class="lg:col-span-2 card p-2">
+                        <div class="map-container">
+                            <svg class="w-full h-full map-svg" viewBox="0 0 1024 768" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M152.06,201.21L135.5,233.5l-2.5,15l2.5,7l-3,3.5l-10,24.5l-1,34l-14.5,29.5l-4,13.5l-2.5,22l-1.5,14l-12.5,27.5l-2,4.5l-1.5,13l-4.5,12l-12,9l-2,10.5l-1.5,9.5l3.5,6l1,13.5l1.5,13.5l-4.5,2.5l-1.5,8.5l-3.5,3.5l-3.5,11l-2,10.5l-1,22l2.5,11.5l14.5,23l14.5,11l20,13.5l12.5,1.5l14.5-2l14-4l24-10.5l11-8.5l8-10.5l15.5-31l13-33.5l4-14l6.5-19.5l10.5-21l16.5-25.5l10-10l12-7.5l22-7l19.5-2l21.5-1l12,1.5l30,12.5l17.5,13.5l12.5,14l15,22.5l13.5,27l12.5,31l11,28l12,23l15,19l19,15.5l10.5,5l16.5,5.5l19.5,4l16.5,1.5l22-1.5l20.5-4l21.5-7l17-8l15.5-12.5l13.5-16l11.5-19l9.5-22l7-22.5l4.5-20l2-16.5l-0.5-19.5l-3-17.5l-5.5-15.5l-8.5-13l-12-11l-16-9.5l-20.5-8l-24.5-7.5l-28.5-7l-32-6.5l-35.5-6l-38.5-5.5l-41-5l-43-4.5l-45-4l-46.5-3.5l-47.5-3l-48.5-2.5l-49-2l-49.5-1.5l-49.5-1l-49.5-0.5h-49.5l-49,0.5l-48.5,1l-48,1.5l-47,2l-46,2.5l-45,3l-43.5,3.5l-42.5,4l-41,4.5l-39.5,5l-38,5.5l-36.5,6l-34.5,6.5l-32.5,7l-30.5,7.5l-28.5,8l-26,8.5l-23.5,9l-21,9.5l-18.5,10l-16,10.5l-13.5,11l-11,11.5l-8.5,12l-6,12.5l-3.5,13l-1,13.5l1,14l2.5,14.5l3.5,15l4,15.5l4.5,16l4.5,16.5l4,17l3.5,17.5l2.5,18l1.5,18.5l0.5,19l-0.5,19.5l-1.5,20l-2,20.5l-3,21l-3.5,21.5l-4,22l-4.5,22.5l-5,23l-5,23.5l-5,24l-5,24.5l-5,25l-4.5,25.5l-4.5,26l-4,26.5l-3.5,27l-3,27.5l-2.5,28l-2,28.5l-1.5,29l-1,29.5l-0.5,30v30l0.5,29.5l1,29l1.5,28.5l2,28l2.5,27.5l3,27l3.5,26.5l4,26l4.5,25.5l4.5,25l5,24.5l5,24l5,23.5l5,23l4.5,22.5l4.5,22l4,21.5l3.5,21l3,20.5l2.5,20l1.5,19.5l0.5,19l-0.5,18.5l-1.5,18l-2.5,17.5l-3.5,17l-4,16.5l-4.5,16l-4.5,15.5l-4.5,15l-4,14.5l-3.5,14l-2.5,13.5l-1.5,13l-0.5,12.5v12l0.5,11.5l1,11l1.5,10.5l2,10l2.5,9.5l3,9l3.5,8.5l4,8l4,7.5l4.5,7l4.5,6.5l4.5,6l4.5,5.5l4.5,5l4,4.5l4,4l3.5,3.5l3.5,3l3,2.5l2.5,2l2,1.5l1.5,1l0.5,0.5h-0.5l-1-0.5l-1.5-1l-2-1.5l-2.5-2l-3-2.5l-3.5-3l-3.5-3.5l-4-4l-4-4.5l-4.5-5l-4.5-5.5l-4.5-6l-4.5-6.5l-4.5-7l-4.5-7.5l-4-8l-4-8.5l-3.5-9l-3.5-9.5l-3-10l-2.5-10.5l-2-11l-1.5-11.5l-1-12l-0.5-12.5v-13l0.5-13.5l1-14l1.5-14.5l2-15l2.5-15.5l3-16l3.5-16.5l3.5-17l4-17.5l4-18l4.5-18.5l4.5-19l4.5-19.5l5-20l5-20.5l5-21l5-21.5l5-22l5-22.5l5-23l4.5-23.5l4.5-24l4.5-24.5l4-25l4-25.5l4-26l3.5-26.5l3.5-27l3-27.5l2.5-28l2-28.5l1.5-29l1-29.5l0.5-30v-30l-0.5-29.5l-1-29l-1.5-28.5l-2-28l-2.5-27.5l-3-27l-3.5-26.5l-4-26l-4-25.5l-4.5-25l-4.5-24.5l-4.5-24l-4.5-23.5l-4.5-23l-5-22.5l-5-22l-5-21.5l-5-21l-5-20.5l-4.5-20l-4.5-19.5l-4.5-19l-4.5-18.5l-4.5-18l-4-17.5l-4-17l-3.5-16.5l-3.5-16l-3-15.5l-3-15l-2.5-14.5l-2-14l-1.5-13.5l-1-13l-0.5-12.5v-12l0.5-11.5l0.5-11l1-10.5l1.5-10l1.5-9.5l2-9l2.5-8.5l2.5-8l3-7.5l3-7l3.5-6.5l3.5-6l3.5-5.5l4-5l4-4.5l4-4l4-3.5l4-3l4-2.5l4.5-2l4.5-1.5l4.5-1l4.5-0.5h4.5l4.5,0.5l4.5,1l4.5,1.5l4.5,2l4.5,2.5l4.5,3l4.5,3.5l4.5,4l4.5,4.5l4.5,5l4,5.5l4,6l4,6.5l3.5,7l3.5,7.5l3.5,8l3,8.5l3,9l2.5,9.5l2.5,10l2,10.5l1.5,11l1.5,11.5l1,12l0.5,12.5v13l-0.5,13.5l-1,14l-1.5,14.5l-1.5,15l-2,15.5l-2.5,16l-2.5,16.5l-3,17l-3,17.5l-3.5,18l-3.5,18.5l-3.5,19l-3.5,19.5l-4,20l-4,20.5l-4,21l-4,21.5l-4,22l-4,22.5l-4,23l-4,23.5l-3.5,24l-3.5,24.5l-3.5,25l-3.5,25.5l-3.5,26l-3,26.5l-3,27l-2.5,27.5l-2.5,28l-2,28.5l-1.5,29l-1,29.5l-0.5,30v30l0.5,29.5l1,29l1.5,28.5l2,28l2.5,27.5l2.5,27l3,26.5l3,26l3.5,25.5l3.5,25l3.5,24.5l3.5,24l3.5,23.5l4,23l4,22.5l4,22l4,21.5l4,21l4,20.5l4,20l4,19.5l3.5,19l3.5,18.5l3.5,18l3.5,17.5l3,17l3,16.5l2.5,16l2.5,15.5l2,15l1.5,14.5l1.5,14l1,13.5l0.5,13v-12.5l-0.5-12l-0.5-11.5l-1-11l-1.5-10.5l-1.5-10l-2-9.5l-2-9l-2.5-8.5l-2.5-8l-3-7.5l-3-7l-3-6.5l-3.5-6l-3.5-5.5l-3.5-5l-4-4.5l-4-4l-4-3.5l-4-3l-4-2.5l-4.5-2l-4.5-1.5l-4.5-1l-4.5-0.5h-4.5l-4.5,0.5l-4.5,1l-4.5,1.5l-4.5,2l-4.5,2.5l-4.5,3l-4.5,3.5l-4,4l-4,4.5l-4,5l-4,5.5l-3.5,6l-3.5,6.5l-3.5,7l-3.5,7.5l-3,8l-3,8.5l-2.5,9l-2.5,9.5l-2,10l-1.5,10.5l-1.5,11l-1,11.5l-0.5,12v12.5l0.5,13l1,13.5l1,14l1.5,14.5l1.5,15l2,15.5l2,16l2.5,16.5l2.5,17l2.5,17.5l3,18l3,18.5l3,19l3.5,19.5l3.5,20l3.5,20.5l3.5,21l3.5,21.5l3.5,22l3.5,22.5l3.5,23l3,23.5l3,24l3,24.5l3,25l2.5,25.5l2.5,26l2.5,26.5l2,27l2,27.5l1.5,28l1.5,28.5l1,29l0.5,29.5v30l-0.5,29.5l-1,29l-1.5,28.5l-1.5,28l-2,27.5l-2,27l-2.5,26.5l-2.5,26l-2.5,25.5l-3,25l-3,24.5l-3,24l-3,23.5l-3,23l-3.5,22.5l-3.5,22l-3.5,21.5l-3.5,21l-3.5,20.5l-3.5,20l-3.5,19.5l-3.5,19l-3.5,18.5l-3,18l-3,17.5l-3,17l-2.5,16.5l-2.5,16l-2.5,15.5l-2,15l-2,14.5l-1.5,14l-1.5,13.5l-1,13l-0.5,12.5z" />
+                            </svg>
+                            <div id="map-points-container" class="absolute top-0 left-0 w-full h-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
         <!-- Footer -->
-        <footer class="text-center text-gray-500 mt-12 text-sm">
-            <p>© 2025 AeroGuard Industries. All rights reserved.</p>
-            <div class="mt-2 space-x-4">
-                <a href="#" class="hover:text-white">Privacy</a>
-                <span>&middot;</span>
-                <a href="#" class="hover:text-white">Terms</a>
-                <span>&middot;</span>
-                <a href="#" class="hover:text-white">Contact</a>
+        <footer class="bg-transparent text-white mt-8">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm text-gray-500">
+                <p>&copy; 2025 AeroForecast // Simulated data based on NASA TEMPO mission parameters.</p>
             </div>
         </footer>
+
     </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-        const mockData = <?php echo json_encode($mockData); ?>;
-        const recentSearches = <?php echo json_encode($recentSearches); ?>;
-        const futuristicTips = <?php echo json_encode($futuristicTips); ?>;
-        const mapPoints = <?php echo json_encode($mapPoints); ?>;
-
-        const aqiGaugeFg = document.getElementById('aqi-gauge-fg');
-        const aqiValue = document.getElementById('aqi-value');
-        const aqiStatusBadge = document.getElementById('aqi-status-badge');
-        const currentCity = document.getElementById('current-city');
-        const updateTime = document.getElementById('update-time');
-        const healthRecommendation = document.getElementById('health-recommendation');
-        const pollutantDetailsContainer = document.querySelector('.grid.grid-cols-3.gap-x-6');
-        const recentSearchesContainer = document.getElementById('recent-searches');
-        const tipContainer = document.getElementById('tip-container');
-        const mapPointsContainer = document.getElementById('map-points-container');
-        const locationInput = document.getElementById('location-input');
-        
-        function getStatusColor(status) {
-            switch (status.toLowerCase()) {
-                case 'good': return 'green';
-                case 'moderate': return 'yellow';
-                case 'unhealthy': return 'red';
-                default: return 'gray';
-            }
-        }
-
-        function getAqiColorClass(aqi) {
-            if (aqi <= 50) return { stroke: '#4ade80', bg: 'bg-green-500', text: 'text-glow-green' }; // green
-            if (aqi <= 100) return { stroke: '#facc15', bg: 'bg-yellow-400', text: 'text-glow-yellow' }; // yellow
-            if (aqi <= 150) return { stroke: '#f87171', bg: 'bg-red-500', text: 'text-glow-red' }; // red
-            return { stroke: '#ef4444', bg: 'bg-red-600', text: 'text-glow-red' };
-        }
-        
-        function updateDashboard(location) {
-            const data = mockData[location];
-            if (!data) return;
-
-            // Update AQI gauge
-            const colorClasses = getAqiColorClass(data.aqi);
-            const aqiPercentage = Math.min(data.aqi / 2, 100); // Scale AQI for gauge
-            aqiGaugeFg.style.strokeDasharray = 100;
-            aqiGaugeFg.style.strokeDashoffset = 100 - aqiPercentage;
-            aqiGaugeFg.style.stroke = colorClasses.stroke;
-
-            // Update text values with animations
-            let currentAqi = parseInt(aqiValue.textContent);
-            const interval = setInterval(() => {
-                if (currentAqi < data.aqi) currentAqi++;
-                else if (currentAqi > data.aqi) currentAqi--;
-                else clearInterval(interval);
-                aqiValue.textContent = currentAqi;
-            }, 10);
-            
-            aqiValue.className = `text-5xl font-bold ${colorClasses.text}`;
-            aqiStatusBadge.textContent = data.status;
-            aqiStatusBadge.className = `px-4 py-1 rounded-full text-sm font-bold text-white ${colorClasses.bg}`;
-            currentCity.textContent = location;
-            healthRecommendation.textContent = data.recommendation;
-
-            // Update Pollutant Details
-            pollutantDetailsContainer.innerHTML = `
-                ${createPollutantCard('PM2.5', data.pm25, 'µg/m³')}
-                ${createPollutantCard('PM10', data.pm10, 'µg/m³')}
-                ${createPollutantCard('O3', data.o3, 'ppb')}
-                ${createPollutantCard('CO', data.co, 'ppm')}
-                ${createPollutantCard('SO2', data.so2, 'ppb')}
-                ${createPollutantCard('NO2', data.no2, 'ppb')}
-            `;
-        }
-
-        function createPollutantCard(name, value, unit) {
-            return `
-                <div class="text-center p-3 rounded-lg bg-black bg-opacity-20 hover:bg-opacity-40 transition">
-                    <p class="text-sm text-gray-400">${name}</p>
-                    <p class="text-xl font-semibold text-white">${value}</p>
-                    <p class="text-xs text-gray-500">${unit}</p>
-                </div>
-            `;
-        }
-        
-        function populateRecentSearches() {
-            recentSearchesContainer.innerHTML = recentSearches.map(item => `
-                <li class="flex justify-between items-center cursor-pointer p-3 -m-3 rounded-lg hover:bg-black hover:bg-opacity-20 transition search-item" data-location="${item.location}">
-                    <span class="font-medium"><i class="fas fa-map-marker-alt mr-3 text-gray-500"></i>${item.location}</span>
-                    <span class="px-3 py-1 text-xs font-bold rounded-full text-white bg-${getStatusColor(item.status)}-500">${item.status}</span>
-                </li>
-            `).join('');
-        }
-
-        function cycleTips() {
-            let currentTipIndex = 0;
-            setInterval(() => {
-                currentTipIndex = (currentTipIndex + 1) % futuristicTips.length;
-                const tip = futuristicTips[currentTipIndex];
-                tipContainer.innerHTML = `
-                 <div class="flex items-start space-x-3">
-                        <i class="fas ${tip.icon} text-cyan-300 mt-1"></i>
-                        <p>${tip.text}</p>
-                    </div>`;
-            }, 7000);
-            // Initial tip
-            const initialTip = futuristicTips[0];
-            tipContainer.innerHTML = `<div class="flex items-start space-x-3">
-                        <i class="fas ${initialTip.icon} text-cyan-300 mt-1"></i>
-                        <p>${initialTip.text}</p>
-                    </div>`;
-        }
-
-        function populateMap() {
-            mapPointsContainer.innerHTML = mapPoints.map(point => `
-                <div class="map-point" style="left: ${point.x}; top: ${point.y}; background-color: ${getStatusColor(point.status)}; animation-delay: ${Math.random() * 1.5}s"></div>
-            `).join('');
-        }
-
-        // Event Listeners
-        document.querySelector('.btn-primary').addEventListener('click', () => {
-             const location = locationInput.value.trim();
-             // In a real app, you would have an API call here.
-             // We will simulate it by checking if the location exists in mockData.
-             const titleCaseLocation = location.split(' ').map(w => w.charAt(0).toUpperCase() + w.substring(1).toLowerCase()).join(' ');
-             if(mockData[titleCaseLocation]) {
-                updateDashboard(titleCaseLocation);
-             } else {
-                alert('Location not found. Try "San Francisco, CA", "Denver, CO", etc.');
-             }
-        });
-        
-        locationInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                document.querySelector('.btn-primary').click();
-            }
-        });
-
-        recentSearchesContainer.addEventListener('click', (e) => {
-            const item = e.target.closest('.search-item');
-            if (item) {
-                const location = item.dataset.location;
-                updateDashboard(location);
-                locationInput.value = location;
-            }
-        });
-
-        // Initial Load
-        updateDashboard('San Francisco, CA');
-        populateRecentSearches();
-        cycleTips();
-        populateMap();
-
-        // Fake real-time update
-        setInterval(() => {
-            updateTime.textContent = 'Updated just now';
-        }, 60000);
-
-    });
-</script>
+    <!-- Link to the external JavaScript file -->
+    <script src="script.js"></script>
 </body>
 </html>
