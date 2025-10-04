@@ -1,0 +1,58 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0a0a1a;
+    color: #e0e0e0;
+}
+.glass-card {
+    background: rgba(22, 22, 44, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+.btn-primary {
+    background: linear-gradient(90deg, #3a82f6, #6b46c1);
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(58, 130, 246, 0.5);
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(58, 130, 246, 0.8);
+}
+.aqi-gauge-bg {
+    stroke: rgba(255, 255, 255, 0.1);
+}
+.aqi-gauge-fg {
+    transition: stroke-dashoffset 1s ease-in-out;
+    stroke-linecap: round;
+}
+.status-dot {
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+.text-glow-green { text-shadow: 0 0 8px rgba(74, 222, 128, 0.7); }
+.text-glow-yellow { text-shadow: 0 0 8px rgba(250, 204, 21, 0.7); }
+.text-glow-red { text-shadow: 0 0 8px rgba(239, 68, 68, 0.7); }
+
+.map-overlay {
+    position: absolute;
+    top:0; left:0; right:0; bottom:0;
+    background: linear-gradient(to top, rgba(10,10,26,1) 0%, rgba(10,10,26,0) 100%);
+}
+.map-point {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    animation: map-pulse 1.5s infinite ease-out;
+}
+@keyframes map-pulse {
+    0% { transform: scale(0.5); opacity: 0.0; }
+    50% { opacity: 1.0; }
+    100% { transform: scale(1.5); opacity: 0.0; }
+}
