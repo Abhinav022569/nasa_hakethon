@@ -1,14 +1,32 @@
-// --- FRONTEND JAVASCRIPT LOGIC (script.js) ---
+// --- FRONTEND JAVASCRIPT LOGIC (script.js) with Leaflet.js Integration ---
 
 const AirsightApp = {
+    map: null, // To hold the map instance
+
     init() {
+        // Initialize the Leaflet map
+        this.initializeMap(); 
+
         document.getElementById('search-input').addEventListener('keyup', (event) => {
             if (event.key === 'Enter') this.handleSearch();
         });
+
         this.renderMap();
         this.renderAqiGuidance();
+        
         // Initial search for a default location
         this.searchForCity("Denver"); 
+    },
+
+    initializeMap() {
+        // Create a map in the "map-container" div, set the view to a central US location
+        this.map = L.map('map-container').setView([39.82, -98.57], 4);
+
+        // Add a tile layer from OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(this.map);
     },
 
     async handleSearch() {
@@ -22,6 +40,7 @@ const AirsightApp = {
         document.getElementById('results-container').classList.add('hidden');
         document.getElementById('loader').classList.remove('hidden');
 
+        // Fetch city data from our backend API
         const cityData = await this.fetchDataForCity(city);
         
         document.getElementById('loader').classList.add('hidden');
@@ -29,6 +48,12 @@ const AirsightApp = {
         if (cityData) {
             document.getElementById('results-container').classList.remove('hidden');
             this.updateDashboard(city, cityData);
+            
+            // Pan the map to the new city's location
+            if (this.map && cityData.lat && cityData.lon) {
+                this.map.flyTo([cityData.lat, cityData.lon], 8); // Zoom in closer
+            }
+
         } else {
             alert('Location not found. Please try another city.');
             document.getElementById('results-container').classList.add('hidden');
@@ -38,8 +63,6 @@ const AirsightApp = {
 
     async fetchDataForCity(city) {
         try {
-            // Use a small delay to simulate network request
-            await new Promise(resolve => setTimeout(resolve, 500));
             const response = await fetch(`api.php?city=${encodeURIComponent(city)}`);
             if (!response.ok) {
                 console.error("API Error:", response.statusText);
@@ -53,31 +76,31 @@ const AirsightApp = {
     },
 
     updateDashboard(city, data) {
-        // Update Current Conditions
         const aqiDetails = this.getAQIDetails(data.aqi);
         const badge = document.getElementById('current-aqi-badge');
         badge.textContent = `AQI ${data.aqi}`;
+        badge.className = 'aqi-badge'; // Reset classes
         badge.style.backgroundColor = `${aqiDetails.hex}30`;
         badge.style.color = aqiDetails.hex;
-        this.renderCurrentPollutants(data.pollutants);
 
-        // Update Forecast List
+        this.renderCurrentPollutants(data.pollutants);
         this.renderForecastList(data.forecast);
     },
 
     renderCurrentPollutants(pollutants) {
         const container = document.getElementById('current-pollutants');
         container.innerHTML = '';
+        // Use PM2.5, O3, and NO2 from your api.php response
         const pollutantData = [
-            { name: 'PM2.5', value: pollutants.pm25, unit: 'µg/m³' },
-            { name: 'Ozone (O₃)', value: pollutants.o3, unit: 'ppb' },
-            { name: 'NO₂', value: pollutants.no2, unit: 'ppb' }
+            { name: 'PM2.5', value: pollutants.pm25.toFixed(2), unit: 'µg/m³' },
+            { name: 'Ozone (O₃)', value: pollutants.o3.toFixed(2), unit: 'µg/m³' },
+            { name: 'NO₂', value: pollutants.no2.toFixed(2), unit: 'µg/m³' }
         ];
         pollutantData.forEach(p => {
             container.innerHTML += `
-                <div class="current-pollutant">
+                <div class="current-pollutant text-center">
                     <div class="value">${p.value}</div>
-                    <div class="unit">${p.name}</div>
+                    <div class="unit text-xs">${p.name}</div>
                 </div>
             `;
         });
@@ -86,9 +109,10 @@ const AirsightApp = {
     renderForecastList(forecast) {
         const list = document.getElementById('forecast-list');
         list.innerHTML = '';
-        forecast.slice(0, 3).forEach(item => { // Show first 3 days
+        // Use the first 3 days from the forecast array
+        forecast.slice(0, 3).forEach(item => {
             const aqiDetails = this.getAQIDetails(item.aqi);
-            const barWidth = Math.min(100, (item.aqi / 300) * 100); // Scale bar width up to 300 AQI
+            const barWidth = Math.min(100, (item.aqi / 300) * 100);
             list.innerHTML += `
                 <li class="forecast-item">
                     <span class="day">${item.day}</span>
@@ -96,7 +120,7 @@ const AirsightApp = {
                         <div class="aqi-bar-container">
                             <div class="aqi-bar" style="width: ${barWidth}%; background-color: ${aqiDetails.hex};"></div>
                         </div>
-                        <span class="font-bold" style="color: ${aqiDetails.hex};">${item.aqi}</span>
+                        <span class="font-bold w-8 text-right" style="color: ${aqiDetails.hex};">${item.aqi}</span>
                     </div>
                 </li>
             `;
@@ -106,10 +130,10 @@ const AirsightApp = {
     renderAqiGuidance() {
         const container = document.getElementById('aqi-guidance');
         const guidanceLevels = [
-            this.getAQIDetails(25), // Good
-            this.getAQIDetails(75), // Moderate
-            this.getAQIDetails(125), // Unhealthy for Sensitive
-            this.getAQIDetails(175), // Unhealthy
+            this.getAQIDetails(25),   // Good
+            this.getAQIDetails(75),   // Moderate
+            this.getAQIDetails(125),  // Unhealthy for Sensitive
+            this.getAQIDetails(175),  // Unhealthy
         ];
         container.innerHTML = '';
         guidanceLevels.forEach(level => {
@@ -122,35 +146,44 @@ const AirsightApp = {
         });
     },
 
-    // --- Map Rendering ---
+    // --- Map Rendering with Leaflet ---
     renderMap() {
-        const mapContainer = document.getElementById('map-points-container');
-        if (!mapContainer) return;
-        mapContainer.innerHTML = ''; 
+        if (!this.map) return;
 
-        const cityCoords = {
-            "new york": { x: 780, y: 280, aqi: 45 }, "los angeles": { x: 230, y: 410, aqi: 88 },
-            "chicago": { x: 600, y: 310, aqi: 65 }, "houston": { x: 500, y: 550, aqi: 110 },
-            "phoenix": { x: 300, y: 450, aqi: 95 }, "toronto": { x: 720, y: 250, aqi: 55 },
-            "mexico city": { x: 450, y: 700, aqi: 155 }, "denver": { x: 400, y: 350, aqi: 72 },
-            "seattle": { x: 200, y: 150, aqi: 30 }
+        // Use the same city list from your original api.php cache for the markers
+        const cityData = {
+            "New York":    { lat: 40.71, lon: -74.00, aqi: 45 },
+            "Los Angeles": { lat: 34.05, lon: -118.24, aqi: 88 },
+            "Chicago":     { lat: 41.87, lon: -87.62, aqi: 65 },
+            "Houston":     { lat: 29.76, lon: -95.36, aqi: 110 },
+            "Phoenix":     { lat: 33.44, lon: -112.07, aqi: 95 },
+            "Toronto":     { lat: 43.65, lon: -79.38, aqi: 55 },
+            "Mexico City": { lat: 19.43, lon: -99.13, aqi: 155 },
+            "Denver":      { lat: 39.73, lon: -104.99, aqi: 72 },
+            "Seattle":     { lat: 47.60, lon: -122.33, aqi: 30 }
         };
 
-        for (const city in cityCoords) {
-            const data = cityCoords[city];
+        for (const city in cityData) {
+            const data = cityData[city];
             const aqiDetails = this.getAQIDetails(data.aqi);
-            const point = document.createElement('div');
-            point.className = 'map-point';
-            // Note: These coordinates are arbitrary for this placeholder map
-            point.style.left = `${(data.x / 1024) * 100}%`;
-            point.style.top = `${(data.y / 768) * 100}%`;
-            point.style.backgroundColor = aqiDetails.hex;
-            point.title = `${this.capitalize(city)} - AQI: ${data.aqi}`;
-            point.onclick = () => {
-                document.getElementById('search-input').value = city;
-                this.handleSearch();
-            };
-            mapContainer.appendChild(point);
+
+            // Create a circle marker instead of a standard pin
+            const marker = L.circleMarker([data.lat, data.lon], {
+                radius: 8,
+                fillColor: aqiDetails.hex,
+                color: "#fff",
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(this.map);
+
+            // Add a popup that shows info on click
+            marker.bindPopup(`<b>${city}</b><br>AQI: ${data.aqi}`);
+
+            // Add a click event to the marker
+            marker.on('click', () => {
+                this.searchForCity(city);
+            });
         }
     },
             
@@ -161,12 +194,7 @@ const AirsightApp = {
         if (aqi <= 200) return { category: 'Unhealthy', hex: '#ef4444', healthImplications: 'Everyone should reduce heavy outdoor exertion.' };
         if (aqi <= 300) return { category: 'Very Unhealthy', hex: '#a855f7', healthImplications: 'Everyone should avoid all physical activity outdoors.' };
         return { category: 'Hazardous', hex: '#be123c', healthImplications: 'Remain indoors and keep activity levels low.' };
-    },
-            
-    capitalize(str) {
-        return str.replace(/\b\w/g, char => char.toUpperCase());
     }
 };
 
 document.addEventListener('DOMContentLoaded', () => AirsightApp.init());
-

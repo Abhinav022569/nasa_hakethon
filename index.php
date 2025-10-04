@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Airsight - Air Quality Forecast</title>
-    <!-- Tailwind CSS for utility classes -->
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Link to the external stylesheet -->
     <link href="style.css" rel="stylesheet">
 </head>
 <body class="flex">
@@ -83,8 +85,6 @@
                         </div>
                    </div>
                    <div class="map-container" id="map-container">
-                        <!-- Simplified map placeholder -->
-                        <div id="map-points-container" class="absolute top-0 left-0 w-full h-full"></div>
                    </div>
                 </div>
             </div>
