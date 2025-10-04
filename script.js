@@ -1,9 +1,9 @@
-// --- FRONTEND JAVASCRIPT LOGIC (script.js) - No Heatmap Version ---
+// --- FRONTEND JAVASCRIPT LOGIC (script.js) ---
 
 const AirsightApp = {
     map: null,
     tempMarker: null,
-    // heatLayer has been removed
+    currentData: null, // Stores the latest API response
 
     init() {
         this.initializeMap(); 
@@ -11,12 +11,30 @@ const AirsightApp = {
             if (event.key === 'Enter') this.handleSearch();
         });
         this.renderAqiGuidance();
-        // The call to renderHeatmap() has been removed.
-        this.searchForLocation({ city: "Denver" }); 
+        this.setupToggleButtons();
+        // CHANGED: Default search location is now Delhi
+        this.searchForLocation({ city: "Delhi" }); 
+    },
+
+    setupToggleButtons() {
+        const toggleButtons = document.querySelectorAll('.toggle-switch .toggle-btn');
+        // Daily button
+        toggleButtons[0].addEventListener('click', () => {
+            toggleButtons[0].classList.add('active');
+            toggleButtons[1].classList.remove('active');
+            this.renderDailyForecast();
+        });
+        // Hourly button
+        toggleButtons[1].addEventListener('click', () => {
+            toggleButtons[1].classList.add('active');
+            toggleButtons[0].classList.remove('active');
+            this.renderHourlyForecast();
+        });
     },
 
     initializeMap() {
-        this.map = L.map('map-container').setView([20, 0], 2); 
+        // CHANGED: Initial map view is now centered on Delhi
+        this.map = L.map('map-container').setView([28.70, 77.10], 7); 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -33,8 +51,6 @@ const AirsightApp = {
             this.searchForLocation({ lat: lat, lon: lng, name: "Clicked Location" });
         });
     },
-
-    // The entire renderHeatmap() function has been removed.
 
     async handleSearch() {
         const query = document.getElementById('search-input').value.trim();
@@ -60,8 +76,10 @@ const AirsightApp = {
                 this.map.flyTo([locationData.lat, locationData.lon], 8);
                 if (this.tempMarker) {
                     this.tempMarker.setLatLng([locationData.lat, locationData.lon]);
-                    this.tempMarker.bindPopup(`<b>${displayName}</b><br>AQI: ${locationData.aqi}`).openPopup();
+                } else {
+                    this.tempMarker = L.marker([locationData.lat, locationData.lon]).addTo(this.map);
                 }
+                this.tempMarker.bindPopup(`<b>${displayName}</b><br>AQI: ${locationData.aqi}`).openPopup();
             }
         } else {
             alert('Location not found. Please try another city.');
@@ -91,31 +109,56 @@ const AirsightApp = {
     },
     
     updateDashboard(name, data) {
+        this.currentData = data; // Store the full data object
         const aqiDetails = this.getAQIDetails(data.aqi);
         const badge = document.getElementById('current-aqi-badge');
         badge.textContent = `AQI ${data.aqi}`;
         badge.style.backgroundColor = `${aqiDetails.hex}30`;
         badge.style.color = aqiDetails.hex;
         this.renderCurrentPollutants(data.pollutants);
-        this.renderForecastList(data.forecast);
+        this.renderDailyForecast(); // Render daily forecast by default
     },
+
     renderCurrentPollutants(pollutants) {
         const container = document.getElementById('current-pollutants'); container.innerHTML = '';
         const poll_data = [{ n: 'PM2.5', v: pollutants.pm25.toFixed(2) }, { n: 'Ozone (O₃)', v: pollutants.o3.toFixed(2) }, { n: 'NO₂', v: pollutants.no2.toFixed(2) }];
         poll_data.forEach(p => { container.innerHTML += `<div class="current-pollutant text-center"><div class="value">${p.v}</div><div class="unit text-xs">${p.n}</div></div>`; });
     },
-    renderForecastList(forecast) {
-        const list = document.getElementById('forecast-list'); list.innerHTML = '';
-        forecast.slice(0, 3).forEach(item => {
-            const aqiDetails = this.getAQIDetails(item.aqi); const barWidth = Math.min(100, (item.aqi / 300) * 100);
+
+    renderDailyForecast() {
+        if (!this.currentData) return;
+        const list = document.getElementById('forecast-list');
+        list.innerHTML = '';
+        this.currentData.forecast.slice(0, 3).forEach(item => {
+            const aqiDetails = this.getAQIDetails(item.aqi); 
+            const barWidth = Math.min(100, (item.aqi / 300) * 100);
             list.innerHTML += `<li class="forecast-item"><span class="day">${item.day}</span><div class="aqi-trend"><div class="aqi-bar-container"><div class="aqi-bar" style="width: ${barWidth}%; background-color: ${aqiDetails.hex};"></div></div><span class="font-bold w-8 text-right" style="color: ${aqiDetails.hex};">${item.aqi}</span></div></li>`;
         });
     },
+
+    renderHourlyForecast() {
+        if (!this.currentData) return;
+        const list = document.getElementById('forecast-list');
+        list.innerHTML = '';
+        this.currentData.hourly_forecast.slice(0, 5).forEach(item => {
+            const aqiDetails = this.getAQIDetails(item.aqi);
+            const barWidth = Math.min(100, (item.aqi / 300) * 100);
+            
+            let hour = item.hour % 12;
+            if (hour === 0) hour = 12;
+            const ampm = item.hour >= 12 ? 'PM' : 'AM';
+            const displayTime = `${hour} ${ampm}`;
+            
+            list.innerHTML += `<li class="forecast-item"><span class="day">${displayTime}</span><div class="aqi-trend"><div class="aqi-bar-container"><div class="aqi-bar" style="width: ${barWidth}%; background-color: ${aqiDetails.hex};"></div></div><span class="font-bold w-8 text-right" style="color: ${aqiDetails.hex};">${item.aqi}</span></div></li>`;
+        });
+    },
+
     renderAqiGuidance() {
         const container = document.getElementById('aqi-guidance');
         const levels = [this.getAQIDetails(25), this.getAQIDetails(75), this.getAQIDetails(125), this.getAQIDetails(175)];
         container.innerHTML = ''; levels.forEach(level => { container.innerHTML += `<div><p class="font-semibold" style="color: ${level.hex};">${level.category}</p><p class="text-gray-600">${level.healthImplications}</p></div>`; });
     },
+    
     getAQIDetails(aqi) {
         if (aqi <= 50) return { category: 'Good', hex: '#22c55e', healthImplications: 'Air quality is satisfactory...' };
         if (aqi <= 100) return { category: 'Moderate', hex: '#facc15', healthImplications: 'Unusually sensitive individuals...' };
@@ -124,6 +167,7 @@ const AirsightApp = {
         if (aqi <= 300) return { category: 'Very Unhealthy', hex: '#a855f7', healthImplications: 'Everyone should avoid...' };
         return { category: 'Hazardous', hex: '#be123c', healthImplications: 'Remain indoors...' };
     },
+    
     capitalize(str) { return str.replace(/\b\w/g, char => char.toUpperCase()); }
 };
 

@@ -1,0 +1,33 @@
+/* --- FORECAST PAGE STYLESHEET (forecast.css) --- */
+
+.chart-container {
+    position: relative;
+    height: 250px; /* Adjust height as needed */
+    width: 100%;
+}
+
+.guidance-card {
+    position: sticky;
+    top: 88px; /* height of top-nav + padding */
+}
+
+.guidance-section {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+}
+
+.guidance-section:first-child {
+    border-top: none;
+    padding-top: 0;
+}
+
+.guidance-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.guidance-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}

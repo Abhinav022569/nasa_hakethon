@@ -8,13 +8,10 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="style.css" rel="stylesheet">
 </head>
 <body class="flex">
-    <!-- Left Navigation Sidebar -->
     <aside class="sidebar">
         <div class="p-4">
             <h1 class="text-2xl font-bold text-white flex items-center gap-2">
@@ -25,11 +22,11 @@
             </h1>
         </div>
         <nav class="mt-8 flex-grow">
-            <a href="#" class="sidebar-link active">
+            <a href="index.php" class="sidebar-link active">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
                 <span>Home</span>
             </a>
-             <a href="#" class="sidebar-link">
+            <a href="forecast.php" class="sidebar-link">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                 <span>Forecast</span>
             </a>
@@ -42,14 +39,11 @@
         </div>
     </aside>
 
-    <!-- Main Content Area -->
     <main class="flex-1">
-        <!-- Top Navigation -->
         <nav class="top-nav">
              <div class="flex items-center gap-4">
                 <a href="#" class="nav-tab active">Map</a>
-                <a href="#" class="nav-tab">Forecast</a>
-                <a href="#" class="nav-tab">Alerts</a>
+                <a href="forecast.php" class="nav-tab">Forecast</a>
              </div>
              <div class="flex items-center gap-4">
                 <div class="search-container">
@@ -59,9 +53,7 @@
              </div>
         </nav>
         
-        <!-- Content Grid -->
         <div class="p-6 grid grid-cols-12 gap-6">
-            <!-- Map and Central Content -->
             <div class="col-span-12 lg:col-span-8">
                 <div class="map-card">
                    <div class="map-controls">
@@ -76,22 +68,18 @@
                 </div>
             </div>
 
-            <!-- Right Sidebar -->
             <aside class="col-span-12 lg:col-span-4 space-y-6">
                 <div id="loader" class="loader-container hidden"><div class="loader"></div></div>
                 <div id="results-container" class="hidden space-y-6">
-                    <!-- Current Conditions -->
                     <div class="card p-4">
                         <div class="flex justify-between items-center mb-3">
                              <h3 class="font-semibold text-gray-700">Current AIR Conditions</h3>
                              <span id="current-aqi-badge" class="aqi-badge"></span>
                         </div>
                         <div id="current-pollutants" class="grid grid-cols-3 gap-3">
-                            <!-- Current pollutants injected here -->
-                        </div>
+                            </div>
                     </div>
                     
-                    <!-- Forecast -->
                     <div class="card p-4">
                         <div class="flex justify-between items-center mb-3">
                              <h3 class="font-semibold text-gray-700">Forecast</h3>
@@ -101,19 +89,15 @@
                              </div>
                         </div>
                         <ul id="forecast-list" class="space-y-3">
-                           <!-- Forecast items injected here -->
-                        </ul>
+                           </ul>
                     </div>
 
-                    <!-- AQI Guidance -->
                     <div class="card p-4">
                         <h3 class="font-semibold text-gray-700 mb-2">AQI Levels & Guidance</h3>
                         <div id="aqi-guidance" class="space-y-2 text-xs">
-                             <!-- Guidance injected here -->
-                        </div>
+                             </div>
                     </div>
                 </div>
-                <!-- Initial State Message -->
                 <div id="initial-message" class="text-center text-gray-400 mt-10">
                     <h3 class="font-semibold text-gray-600">Awaiting Location</h3>
                     <p class="text-sm">Search for a city to view air quality data and forecasts.</p>
@@ -122,8 +106,6 @@
         </div>
     </main>
 
-    <!-- Link to the external JavaScript file -->
     <script src="script.js"></script>
 </body>
 </html>
-
