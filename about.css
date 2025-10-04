@@ -1,0 +1,15 @@
+/* --- ABOUT PAGE STYLESHEET (about.css) --- */
+
+.about-item {
+    padding-left: 1rem;
+    border-left: 3px solid var(--accent-primary);
+}
+
+.contact-item {
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.contact-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
