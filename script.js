@@ -6,14 +6,14 @@ const AirsightApp = {
     currentData: null, // Stores the latest API response
 
     init() {
-        this.initializeMap(); 
+        this.initializeMap();
         document.getElementById('search-input').addEventListener('keyup', (event) => {
             if (event.key === 'Enter') this.handleSearch();
         });
         this.renderAqiGuidance();
         this.setupToggleButtons();
-        // CHANGED: Default search location is now Delhi
-        this.searchForLocation({ city: "Delhi" }); 
+        // CHANGED: Default search location is now Houston, Texas
+        this.searchForLocation({ city: "Houston, Texas" });
     },
 
     setupToggleButtons() {
@@ -33,8 +33,8 @@ const AirsightApp = {
     },
 
     initializeMap() {
-        // CHANGED: Initial map view is now centered on Delhi
-        this.map = L.map('map-container').setView([28.70, 77.10], 7); 
+        // CHANGED: Initial map view is now centered on Houston, Texas
+        this.map = L.map('map-container').setView([29.76, -95.37], 7);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -57,21 +57,21 @@ const AirsightApp = {
         if (!query) return;
         this.searchForLocation({ city: query });
     },
-    
+
     async searchForLocation(location) {
         document.getElementById('initial-message').classList.add('hidden');
         document.getElementById('results-container').classList.add('hidden');
         document.getElementById('loader').classList.remove('hidden');
 
         const locationData = await this.fetchLocationData(location);
-        
+
         document.getElementById('loader').classList.add('hidden');
 
         if (locationData) {
             document.getElementById('results-container').classList.remove('hidden');
             const displayName = location.name || this.capitalize(location.city);
             this.updateDashboard(displayName, locationData);
-            
+
             if (this.map && locationData.lat && locationData.lon) {
                 this.map.flyTo([locationData.lat, locationData.lon], 8);
                 if (this.tempMarker) {
@@ -107,7 +107,7 @@ const AirsightApp = {
             return null;
         }
     },
-    
+
     updateDashboard(name, data) {
         this.currentData = data; // Store the full data object
         const aqiDetails = this.getAQIDetails(data.aqi);
@@ -130,7 +130,7 @@ const AirsightApp = {
         const list = document.getElementById('forecast-list');
         list.innerHTML = '';
         this.currentData.forecast.slice(0, 3).forEach(item => {
-            const aqiDetails = this.getAQIDetails(item.aqi); 
+            const aqiDetails = this.getAQIDetails(item.aqi);
             const barWidth = Math.min(100, (item.aqi / 300) * 100);
             list.innerHTML += `<li class="forecast-item"><span class="day">${item.day}</span><div class="aqi-trend"><div class="aqi-bar-container"><div class="aqi-bar" style="width: ${barWidth}%; background-color: ${aqiDetails.hex};"></div></div><span class="font-bold w-8 text-right" style="color: ${aqiDetails.hex};">${item.aqi}</span></div></li>`;
         });
@@ -143,12 +143,12 @@ const AirsightApp = {
         this.currentData.hourly_forecast.slice(0, 5).forEach(item => {
             const aqiDetails = this.getAQIDetails(item.aqi);
             const barWidth = Math.min(100, (item.aqi / 300) * 100);
-            
+
             let hour = item.hour % 12;
             if (hour === 0) hour = 12;
             const ampm = item.hour >= 12 ? 'PM' : 'AM';
             const displayTime = `${hour} ${ampm}`;
-            
+
             list.innerHTML += `<li class="forecast-item"><span class="day">${displayTime}</span><div class="aqi-trend"><div class="aqi-bar-container"><div class="aqi-bar" style="width: ${barWidth}%; background-color: ${aqiDetails.hex};"></div></div><span class="font-bold w-8 text-right" style="color: ${aqiDetails.hex};">${item.aqi}</span></div></li>`;
         });
     },
@@ -158,7 +158,7 @@ const AirsightApp = {
         const levels = [this.getAQIDetails(25), this.getAQIDetails(75), this.getAQIDetails(125), this.getAQIDetails(175)];
         container.innerHTML = ''; levels.forEach(level => { container.innerHTML += `<div><p class="font-semibold" style="color: ${level.hex};">${level.category}</p><p class="text-gray-600">${level.healthImplications}</p></div>`; });
     },
-    
+
     getAQIDetails(aqi) {
         if (aqi <= 50) return { category: 'Good', hex: '#22c55e', healthImplications: 'Air quality is satisfactory...' };
         if (aqi <= 100) return { category: 'Moderate', hex: '#facc15', healthImplications: 'Unusually sensitive individuals...' };
@@ -167,7 +167,7 @@ const AirsightApp = {
         if (aqi <= 300) return { category: 'Very Unhealthy', hex: '#a855f7', healthImplications: 'Everyone should avoid...' };
         return { category: 'Hazardous', hex: '#be123c', healthImplications: 'Remain indoors...' };
     },
-    
+
     capitalize(str) { return str.replace(/\b\w/g, char => char.toUpperCase()); }
 };
 

@@ -12,7 +12,7 @@ const ForecastApp = {
             }
         });
         // Initial load with a default city
-        this.fetchAndRenderData({ city: "New Delhi" }); 
+        this.fetchAndRenderData({ city: "Houston, Texas" });
     },
 
     async fetchAndRenderData(location) {
@@ -23,11 +23,11 @@ const ForecastApp = {
 
         document.getElementById('loader').classList.add('hidden');
         document.getElementById('forecast-content').classList.remove('hidden');
-        
+
         if (data) {
             const displayName = this.capitalize(location.city || `Location (${data.lat.toFixed(2)}, ${data.lon.toFixed(2)})`);
             document.getElementById('location-name').textContent = displayName;
-            
+
             this.renderDailyChart(data.forecast);
             this.renderHourlyChart(data.hourly_forecast);
             this.renderHealthGuidance(data.aqi);
@@ -73,7 +73,7 @@ const ForecastApp = {
             options: this.getChartOptions('7-Day Average AQI')
         });
     },
-    
+
     renderHourlyChart(hourlyData) {
         const ctx = document.getElementById('hourly-forecast-chart').getContext('2d');
         const labels = hourlyData.map(h => h.hour + ':00');
@@ -101,7 +101,7 @@ const ForecastApp = {
     renderHealthGuidance(aqi) {
         const container = document.getElementById('guidance-content');
         const level = this.getAQIDetails(aqi);
-        
+
         container.innerHTML = `
             <div class="guidance-section">
                 <p class="guidance-title">General Population</p>
@@ -141,7 +141,7 @@ const ForecastApp = {
         if (aqi <= 300) return { category: 'Very Unhealthy', hex: '#a855f7', healthImplications: 'Health alert: everyone may experience more serious health effects.' };
         return { category: 'Hazardous', hex: '#be123c', healthImplications: 'Health warnings of emergency conditions. The entire population is more than likely to be affected.' };
     },
-    
+
     getSensitiveGroupGuidance(aqi) {
         if (aqi <= 50) return 'No restrictions for sensitive groups.';
         if (aqi <= 100) return 'Consider reducing prolonged or heavy exertion outdoors.';
@@ -151,8 +151,8 @@ const ForecastApp = {
         return 'Remain indoors and keep activity levels low. Follow tips for keeping particle levels low indoors.';
     },
 
-    capitalize(str) { 
-        return str.replace(/\b\w/g, char => char.toUpperCase()); 
+    capitalize(str) {
+        return str.replace(/\b\w/g, char => char.toUpperCase());
     }
 };
 
