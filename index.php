@@ -9,7 +9,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="style.css" rel="stylesheet">
@@ -74,10 +73,6 @@
                             <span class="legend-item"><span class="dot bg-green-500"></span>Good</span>
                             <span class="legend-item"><span class="dot bg-yellow-400"></span>Moderate</span>
                             <span class="legend-item"><span class="dot bg-red-500"></span>Unhealthy</span>
-                        </div>
-                        <div>
-                             <button class="map-button">Enable Alerts</button>
-                             <button class="map-button secondary">Download Data</button>
                         </div>
                    </div>
                    <div class="map-container" id="map-container">
